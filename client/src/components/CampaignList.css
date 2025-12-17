@@ -1,0 +1,210 @@
+.campaign-list {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.campaign-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.campaign-list-header h2 {
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.refresh-btn {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.refresh-btn:hover {
+  background-color: #5568d3;
+}
+
+.campaigns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.campaign-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #fff;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.campaign-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.campaign-card.ready-for-scaling {
+  border-color: #ffc107;
+  background-color: #fffbf0;
+}
+
+.ready-badge {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background-color: #ffc107;
+  color: #856404;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.campaign-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.campaign-header h3 {
+  color: #333;
+  font-size: 1.25rem;
+  flex: 1;
+}
+
+.campaign-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn, .delete-btn {
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.edit-btn {
+  background-color: #667eea;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #5568d3;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.campaign-details {
+  margin-bottom: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  font-weight: 500;
+  color: #666;
+}
+
+.detail-row .value {
+  color: #333;
+  font-weight: 600;
+}
+
+.detail-row .value.overdue {
+  color: #dc3545;
+}
+
+.campaign-actions-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.notification-btn, .mark-scaled-btn {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.notification-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.notification-btn:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.notification-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.mark-scaled-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.mark-scaled-btn:hover {
+  background-color: #138496;
+}
+
+.empty-state {
+  background-color: white;
+  border-radius: 8px;
+  padding: 3rem;
+  text-align: center;
+  color: #666;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .campaigns-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .campaign-header {
+    flex-direction: column;
+  }
+
+  .campaign-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+

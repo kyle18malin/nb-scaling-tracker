@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+.DS_Store
+*.log
+client/node_modules/
+client/build/
+database.db
+database.db-journal
+.railway/
+.fly/
+
