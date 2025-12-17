@@ -1,0 +1,20 @@
+# Nixpacks configuration for Railway
+# This helps Railway build more efficiently
+
+[phases.setup]
+nixPkgs = ["nodejs-18_x", "npm-9_x"]
+
+[phases.install]
+cmds = [
+  "npm ci --prefer-offline --no-audit",
+  "cd client && npm ci --prefer-offline --no-audit"
+]
+
+[phases.build]
+cmds = [
+  "cd client && npm run build"
+]
+
+[start]
+cmd = "npm start"
+
