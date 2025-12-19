@@ -115,11 +115,11 @@ function App() {
         </button>
       </nav>
 
-      {readyForScaling.length > 0 && (
+      {readyForScaling.length > 0 && activeTab !== 'dashboard' && (
         <div className="alert-banner">
           <strong>{readyForScaling.length} campaign(s) ready for scaling!</strong>
-          <button onClick={handleSendNotifications} className="send-notifications-btn">
-            Send Notifications to Google Sheet
+          <button onClick={() => setActiveTab('dashboard')} className="send-notifications-btn">
+            View Dashboard
           </button>
         </div>
       )}
