@@ -12,15 +12,28 @@ router.post('/send/:campaignId', async (req, res) => {
     }
 
     const campaign = campaigns[0];
-    const result = await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
     
-    // Log the notification
+    // Log the notification to database (always)
     await db.run(
       'INSERT INTO notifications_log (campaign_id, account_name, campaign_name) VALUES (?, ?, ?)',
       [campaign.id, campaign.account_name, campaign.campaign_name]
     );
 
-    res.json({ success: true, message: 'Notification sent successfully', result });
+    // Try to send to Google Sheets if configured (optional)
+    let googleSheetsResult = null;
+    try {
+      googleSheetsResult = await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
+    } catch (error) {
+      // Google Sheets is optional - just log the error but don't fail
+      console.log('Google Sheets notification skipped (optional):', error.message);
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Notification logged successfully', 
+      logged: true,
+      googleSheets: googleSheetsResult ? { sent: true } : { sent: false, note: 'Google Sheets not configured or unavailable' }
+    });
   } catch (error) {
     console.error('Error sending notification:', error);
     res.status(500).json({ error: 'Failed to send notification', details: error.message });
@@ -40,12 +53,27 @@ router.post('/send-all-ready', async (req, res) => {
     const results = [];
     for (const campaign of campaigns) {
       try {
-        const result = await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
+        // Always log to database
         await db.run(
           'INSERT INTO notifications_log (campaign_id, account_name, campaign_name) VALUES (?, ?, ?)',
           [campaign.id, campaign.account_name, campaign.campaign_name]
         );
-        results.push({ campaign: campaign.campaign_name, success: true, result });
+
+        // Try Google Sheets (optional)
+        let googleSheetsSent = false;
+        try {
+          await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
+          googleSheetsSent = true;
+        } catch (error) {
+          console.log(`Google Sheets notification skipped for ${campaign.campaign_name}:`, error.message);
+        }
+
+        results.push({ 
+          campaign: campaign.campaign_name, 
+          success: true, 
+          logged: true,
+          googleSheets: googleSheetsSent 
+        });
       } catch (error) {
         results.push({ campaign: campaign.campaign_name, success: false, error: error.message });
       }

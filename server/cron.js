@@ -24,14 +24,22 @@ const checkAndSendNotifications = async () => {
 
     for (const campaign of campaigns) {
       try {
-        await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
+        // Always log to database
         await db.run(
           'INSERT INTO notifications_log (campaign_id, account_name, campaign_name) VALUES (?, ?, ?)',
           [campaign.id, campaign.account_name, campaign.campaign_name]
         );
-        console.log(`Notification sent for: ${campaign.account_name} - ${campaign.campaign_name}`);
+        console.log(`Notification logged for: ${campaign.account_name} - ${campaign.campaign_name}`);
+        
+        // Try Google Sheets (optional)
+        try {
+          await googleSheets.sendNotification(campaign.account_name, campaign.campaign_name);
+          console.log(`  → Also sent to Google Sheets`);
+        } catch (error) {
+          console.log(`  → Google Sheets skipped (not configured or unavailable)`);
+        }
       } catch (error) {
-        console.error(`Error sending notification for ${campaign.campaign_name}:`, error.message);
+        console.error(`Error processing notification for ${campaign.campaign_name}:`, error.message);
       }
     }
   } catch (error) {

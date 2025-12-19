@@ -51,6 +51,12 @@ const getSheetId = async () => {
 
 const sendNotification = async (accountName, campaignName) => {
   try {
+    // Check if Google Sheets is configured
+    const settings = await db.query('SELECT * FROM settings WHERE key = ?', ['google_sheet_id']);
+    if (settings.length === 0 || !settings[0].value) {
+      throw new Error('Google Sheets not configured');
+    }
+
     if (!auth || !sheets) {
       await initializeAuth();
     }

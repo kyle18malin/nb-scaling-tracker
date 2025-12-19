@@ -83,9 +83,12 @@ const Settings = () => {
         )}
 
         <div className="settings-section">
-          <h3>Google Sheets Configuration</h3>
+          <h3>Google Sheets Configuration (Optional)</h3>
           <p className="section-description">
-            Configure your Google Sheets integration to send notifications. You'll need to:
+            <strong>Note:</strong> All notifications are automatically tracked in the app's database and visible in the "Notification History" tab. Google Sheets integration is optional - if configured, notifications will also be sent to your Google Sheet. If not configured, notifications will still be logged in the app.
+          </p>
+          <p className="section-description">
+            To enable Google Sheets integration, you'll need to:
           </p>
           <ol className="setup-instructions">
             <li>Create a Google Cloud Project and enable Google Sheets API</li>
@@ -95,7 +98,7 @@ const Settings = () => {
           </ol>
 
           <div className="setting-item">
-            <label htmlFor="google_sheet_id">Google Sheet ID *</label>
+            <label htmlFor="google_sheet_id">Google Sheet ID (Optional)</label>
             <input
               type="text"
               id="google_sheet_id"
