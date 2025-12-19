@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Dashboard from './components/Dashboard';
 import CampaignList from './components/CampaignList';
 import CampaignForm from './components/CampaignForm';
 import Settings from './components/Settings';
@@ -10,7 +11,7 @@ const API_BASE = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'pro
 
 function App() {
   const [campaigns, setCampaigns] = useState([]);
-  const [activeTab, setActiveTab] = useState('campaigns');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [editingCampaign, setEditingCampaign] = useState(null);
   const [readyForScaling, setReadyForScaling] = useState([]);
 
@@ -80,6 +81,12 @@ function App() {
 
       <nav className="App-nav">
         <button 
+          className={activeTab === 'dashboard' ? 'active' : ''} 
+          onClick={() => setActiveTab('dashboard')}
+        >
+          Dashboard
+        </button>
+        <button 
           className={activeTab === 'campaigns' ? 'active' : ''} 
           onClick={() => setActiveTab('campaigns')}
         >
@@ -118,6 +125,26 @@ function App() {
       )}
 
       <main className="App-main">
+        {activeTab === 'dashboard' && (
+          <Dashboard 
+            onNavigateToCampaigns={(campaignId) => {
+              if (campaignId === 'add') {
+                setEditingCampaign(null);
+                setActiveTab('form');
+              } else if (campaignId) {
+                const campaign = campaigns.find(c => c.id === campaignId);
+                if (campaign) {
+                  setEditingCampaign(campaign);
+                  setActiveTab('campaigns');
+                } else {
+                  setActiveTab('campaigns');
+                }
+              } else {
+                setActiveTab('campaigns');
+              }
+            }}
+          />
+        )}
         {activeTab === 'campaigns' && (
           <CampaignList 
             campaigns={campaigns}
