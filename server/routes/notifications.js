@@ -45,7 +45,8 @@ router.post('/send-all-ready', async (req, res) => {
   try {
     const campaigns = await db.query(`
       SELECT * FROM campaigns 
-      WHERE last_scaled_date IS NOT NULL
+      WHERE status = 'active'
+      AND last_scaled_date IS NOT NULL
       AND date(last_scaled_date, '+' || notification_interval_days || ' days') <= date('now')
       ORDER BY account_name, campaign_name
     `);

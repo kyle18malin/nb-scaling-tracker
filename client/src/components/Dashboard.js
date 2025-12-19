@@ -29,13 +29,14 @@ const Dashboard = ({ onNavigateToCampaigns }) => {
       // Get all campaigns
       const allCampaigns = await axios.get(`${API_BASE}/campaigns`);
       
-      // Get campaigns ready for scaling
+      // Get campaigns ready for scaling (only active)
       const readyResponse = await axios.get(`${API_BASE}/campaigns/ready-for-scaling/check`);
       const ready = readyResponse.data;
       
-      // Calculate upcoming (ready in next 3 days)
+      // Calculate upcoming (ready in next 3 days) - only active campaigns
       const now = new Date();
       const upcomingCampaigns = allCampaigns.data.filter(campaign => {
+        if (campaign.status !== 'active') return false;
         if (!campaign.last_scaled_date) return false;
         const lastScaled = new Date(campaign.last_scaled_date);
         const intervalDays = campaign.notification_interval_days || 7;
@@ -45,8 +46,9 @@ const Dashboard = ({ onNavigateToCampaigns }) => {
         return daysUntil > 0 && daysUntil <= 3;
       });
 
-      // Calculate stats
-      const neverScaled = allCampaigns.data.filter(c => !c.last_scaled_date).length;
+      // Calculate stats (only active campaigns for scaling stats)
+      const activeCampaigns = allCampaigns.data.filter(c => c.status === 'active');
+      const neverScaled = activeCampaigns.filter(c => !c.last_scaled_date).length;
 
       setReadyForScaling(ready);
       setUpcoming(upcomingCampaigns);
@@ -54,7 +56,10 @@ const Dashboard = ({ onNavigateToCampaigns }) => {
         total: allCampaigns.data.length,
         ready: ready.length,
         upcoming: upcomingCampaigns.length,
-        neverScaled
+        neverScaled,
+        active: activeCampaigns.length,
+        maintenance: allCampaigns.data.filter(c => c.status === 'maintenance').length,
+        loser: allCampaigns.data.filter(c => c.status === 'loser').length
       });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);

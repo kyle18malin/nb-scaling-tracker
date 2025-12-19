@@ -30,16 +30,16 @@ router.get('/:id', async (req, res) => {
 // Create new campaign
 router.post('/', async (req, res) => {
   try {
-    const { account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days } = req.body;
+    const { account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days, status } = req.body;
     
     if (!account_name || !campaign_name || !launch_date) {
       return res.status(400).json({ error: 'Missing required fields: account_name, campaign_name, launch_date' });
     }
 
     const result = await db.run(
-      `INSERT INTO campaigns (account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days, updated_at)
-       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [account_name, campaign_name, launch_date, last_scaled_date || null, notification_interval_days || 7]
+      `INSERT INTO campaigns (account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days, status, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
+      [account_name, campaign_name, launch_date, last_scaled_date || null, notification_interval_days || 7, status || 'active']
     );
 
     const newCampaign = await db.query('SELECT * FROM campaigns WHERE id = ?', [result.id]);
@@ -53,14 +53,14 @@ router.post('/', async (req, res) => {
 // Update campaign
 router.put('/:id', async (req, res) => {
   try {
-    const { account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days } = req.body;
+    const { account_name, campaign_name, launch_date, last_scaled_date, notification_interval_days, status } = req.body;
     
     await db.run(
       `UPDATE campaigns 
        SET account_name = ?, campaign_name = ?, launch_date = ?, last_scaled_date = ?, 
-           notification_interval_days = ?, updated_at = CURRENT_TIMESTAMP
+           notification_interval_days = ?, status = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
-      [account_name, campaign_name, launch_date, last_scaled_date || null, notification_interval_days || 7, req.params.id]
+      [account_name, campaign_name, launch_date, last_scaled_date || null, notification_interval_days || 7, status || 'active', req.params.id]
     );
 
     const updatedCampaign = await db.query('SELECT * FROM campaigns WHERE id = ?', [req.params.id]);
@@ -93,7 +93,8 @@ router.get('/ready-for-scaling/check', async (req, res) => {
   try {
     const campaigns = await db.query(`
       SELECT * FROM campaigns 
-      WHERE last_scaled_date IS NOT NULL
+      WHERE status = 'active'
+      AND last_scaled_date IS NOT NULL
       AND date(last_scaled_date, '+' || notification_interval_days || ' days') <= date('now')
       ORDER BY account_name, campaign_name
     `);

@@ -58,6 +58,31 @@ const CampaignList = ({ campaigns, readyForScaling, onEdit, onDelete, onRefresh 
     }
   };
 
+  const handleStatusChange = async (campaignId, newStatus) => {
+    const campaign = campaigns.find(c => c.id === campaignId);
+    if (!campaign) return;
+
+    try {
+      await axios.put(`${API_BASE}/campaigns/${campaignId}`, {
+        ...campaign,
+        status: newStatus
+      });
+      onRefresh();
+    } catch (error) {
+      console.error('Error updating campaign status:', error);
+      alert('Failed to update campaign status');
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const badges = {
+      active: { text: 'Active', class: 'status-active' },
+      maintenance: { text: 'Maintenance', class: 'status-maintenance' },
+      loser: { text: 'Loser', class: 'status-loser' }
+    };
+    return badges[status] || badges.active;
+  };
+
   if (campaigns.length === 0) {
     return (
       <div className="empty-state">
@@ -80,8 +105,13 @@ const CampaignList = ({ campaigns, readyForScaling, onEdit, onDelete, onRefresh 
           const daysUntil = calculateDaysUntilNextScale(campaign);
 
           return (
-            <div key={campaign.id} className={`campaign-card ${ready ? 'ready-for-scaling' : ''}`}>
-              {ready && <div className="ready-badge">Ready for Scaling</div>}
+            <div key={campaign.id} className={`campaign-card ${ready ? 'ready-for-scaling' : ''} status-${campaign.status || 'active'}`}>
+              {ready && campaign.status === 'active' && <div className="ready-badge">Ready for Scaling</div>}
+              {campaign.status !== 'active' && (
+                <div className={`status-badge ${getStatusBadge(campaign.status || 'active').class}`}>
+                  {getStatusBadge(campaign.status || 'active').text}
+                </div>
+              )}
               
               <div className="campaign-header">
                 <h3>{campaign.campaign_name}</h3>
@@ -126,19 +156,56 @@ const CampaignList = ({ campaigns, readyForScaling, onEdit, onDelete, onRefresh 
                   <span className="label">Notification Interval:</span>
                   <span className="value">{campaign.notification_interval_days || 7} days</span>
                 </div>
+                <div className="detail-row">
+                  <span className="label">Status:</span>
+                  <span className="value">
+                    <span className={`status-text ${getStatusBadge(campaign.status || 'active').class}`}>
+                      {getStatusBadge(campaign.status || 'active').text}
+                    </span>
+                  </span>
+                </div>
               </div>
 
+              <div className="campaign-actions-footer">
+                {campaign.status === 'active' ? (
+                  <>
+                    <button 
+                      onClick={() => handleStatusChange(campaign.id, 'maintenance')}
+                      className="status-btn maintenance-btn"
+                      title="Mark as Maintenance - stops notifications"
+                    >
+                      Mark Maintenance
+                    </button>
+                    <button 
+                      onClick={() => handleStatusChange(campaign.id, 'loser')}
+                      className="status-btn loser-btn"
+                      title="Mark as Loser - stops notifications"
+                    >
+                      Mark Loser
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={() => handleStatusChange(campaign.id, 'active')}
+                    className="status-btn active-btn"
+                    title="Mark as Active - resumes notifications"
+                  >
+                    Mark Active
+                  </button>
+                )}
+              </div>
               <div className="campaign-actions-footer">
                 <button 
                   onClick={() => handleSendNotification(campaign.id)}
                   className="notification-btn"
-                  disabled={!ready}
+                  disabled={!ready || campaign.status !== 'active'}
                 >
                   Send Notification
                 </button>
                 <button 
                   onClick={() => handleMarkAsScaled(campaign.id)}
                   className="mark-scaled-btn"
+                  disabled={campaign.status !== 'active'}
                 >
                   Mark as Scaled Today
                 </button>

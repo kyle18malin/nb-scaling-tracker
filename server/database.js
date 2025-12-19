@@ -25,9 +25,15 @@ const init = () => {
           launch_date TEXT NOT NULL,
           last_scaled_date TEXT,
           notification_interval_days INTEGER DEFAULT 7,
+          status TEXT DEFAULT 'active',
           created_at TEXT DEFAULT CURRENT_TIMESTAMP,
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )`);
+
+        // Add status column to existing campaigns if it doesn't exist
+        db.run(`ALTER TABLE campaigns ADD COLUMN status TEXT DEFAULT 'active'`, (err) => {
+          // Ignore error if column already exists
+        });
 
         // Settings table for global notification preferences
         db.run(`CREATE TABLE IF NOT EXISTS settings (

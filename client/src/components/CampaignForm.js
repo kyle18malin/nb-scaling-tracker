@@ -10,7 +10,8 @@ const CampaignForm = ({ campaign, onSave, onCancel }) => {
     campaign_name: '',
     launch_date: '',
     last_scaled_date: '',
-    notification_interval_days: 7
+    notification_interval_days: 7,
+    status: 'active'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +23,8 @@ const CampaignForm = ({ campaign, onSave, onCancel }) => {
         campaign_name: campaign.campaign_name || '',
         launch_date: campaign.launch_date ? campaign.launch_date.split('T')[0] : '',
         last_scaled_date: campaign.last_scaled_date ? campaign.last_scaled_date.split('T')[0] : '',
-        notification_interval_days: campaign.notification_interval_days || 7
+        notification_interval_days: campaign.notification_interval_days || 7,
+        status: campaign.status || 'active'
       });
     }
   }, [campaign]);
@@ -124,7 +126,23 @@ const CampaignForm = ({ campaign, onSave, onCancel }) => {
               min="1"
               required
             />
-            <small>How many days after last scale to send notification</small>
+            <small>How many days after last scale to send notification. Notifications will continue at this interval until status is changed.</small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status">Campaign Status *</label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              required
+            >
+              <option value="active">Active - Will receive scaling notifications</option>
+              <option value="maintenance">Maintenance - No notifications</option>
+              <option value="loser">Loser - No notifications</option>
+            </select>
+            <small>Active campaigns will receive notifications at the set interval. Maintenance and Loser campaigns will not receive notifications.</small>
           </div>
 
           <div className="form-actions">
